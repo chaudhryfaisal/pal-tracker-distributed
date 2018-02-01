@@ -11,6 +11,10 @@ CREATE USER IF NOT EXISTS 'tracker'@'localhost'
   identified by '';
 GRANT ALL PRIVILEGES ON *.* TO 'tracker' @'localhost';
 
+CREATE USER IF NOT EXISTS 'tracker'@'%'
+  identified by '';
+GRANT ALL PRIVILEGES ON *.* TO 'tracker' @'%';
+
 CREATE DATABASE tracker_allocations_dev;
 CREATE DATABASE tracker_backlog_dev;
 CREATE DATABASE tracker_registration_dev;
