@@ -1,6 +1,6 @@
 ---
 resources:
-- name: pal-tracker
+- name: pal-tracker-distributed
   type: git
   source:
     uri: {{github-repository}}
@@ -11,7 +11,7 @@ resources:
   type: semver
   source:
     bucket: {{aws-bucket}}
-    key: pal-tracker/current-version
+    key: pal-tracker-distributed/current-version
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -19,7 +19,7 @@ resources:
   type: s3
   source:
     bucket: {{aws-bucket}}
-    regexp: pal-tracker/allocations-server-(.*).jar
+    regexp: pal-tracker-distributed/allocations-server-(.*).jar
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -27,7 +27,7 @@ resources:
   type: s3
   source:
     bucket: {{aws-bucket}}
-    regexp: pal-tracker/backlog-server-(.*).jar
+    regexp: pal-tracker-distributed/backlog-server-(.*).jar
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -35,7 +35,7 @@ resources:
   type: s3
   source:
     bucket: {{aws-bucket}}
-    regexp: pal-tracker/registration-server-(.*).jar
+    regexp: pal-tracker-distributed/registration-server-(.*).jar
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -43,7 +43,7 @@ resources:
   type: s3
   source:
     bucket: {{aws-bucket}}
-    regexp: pal-tracker/timesheets-server-(.*).jar
+    regexp: pal-tracker-distributed/timesheets-server-(.*).jar
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -61,13 +61,13 @@ resources:
 jobs:
 - name: build
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-distributed
     trigger: true
   - get: version
     params:
       bump: patch
   - task: build and test
-    file: pal-tracker/ci/build.yml
+    file: pal-tracker-distributed/ci/build.yml
   - put: allocations-artifacts
     params:
       file: build-output/allocations*.jar
@@ -86,52 +86,52 @@ jobs:
 
 - name: deploy-allocations
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-distributed
     passed: [build]
     trigger: true
   - get: allocations-artifacts
     trigger: false
   - put: cf
     params:
-      manifest: pal-tracker/manifest-allocations.yml
+      manifest: pal-tracker-distributed/manifest-allocations.yml
       path: allocations-artifacts/allocations-server*.jar
       current_app_name: tracker-allocations
 
 - name: deploy-backlog
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-distributed
     passed: [build]
     trigger: true
   - get: backlog-artifacts
     trigger: false
   - put: cf
     params:
-      manifest: pal-tracker/manifest-backlog.yml
+      manifest: pal-tracker-distributed/manifest-backlog.yml
       path: backlog-artifacts/backlog-server*.jar
       current_app_name: tracker-backlog
 
 - name: deploy-registration
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-distributed
     passed: [build]
     trigger: true
   - get: registration-artifacts
     trigger: false
   - put: cf
     params:
-      manifest: pal-tracker/manifest-registration.yml
+      manifest: pal-tracker-distributed/manifest-registration.yml
       path: registration-artifacts/registration-server*.jar
       current_app_name: tracker-registration
 
 - name: deploy-timesheets
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-distributed
     passed: [build]
     trigger: true
   - get: timesheets-artifacts
     trigger: false
   - put: cf
     params:
-      manifest: pal-tracker/manifest-timesheets.yml
+      manifest: pal-tracker-distributed/manifest-timesheets.yml
       path: timesheets-artifacts/timesheets-server*.jar
       current_app_name: tracker-timesheets
